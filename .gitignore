@@ -1,7 +1,3 @@
-src/saa/saa
-src/saa/shell.c
-src/saa/sqlite3.c
-src/saa/sqlite3.h
-src/saa/sqlite3ext.h
+
 src/saa/tsp.sql
 /home/dev/Documents/Proyects/Python/AI/AI_Core/src/saa/backup
