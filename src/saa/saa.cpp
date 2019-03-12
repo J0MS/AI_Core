@@ -90,10 +90,9 @@ int getTourLength() {
     cout<<"\n";*/
     it=cities.begin();
     int pcity1=*it,ncity;
-    //cout<<"\n the pcity is "<<pcity1<<"\n";
+    //cout<<"City pointer is "<<pcity1<<"\n";
     int tourLength=distance(0,pcity1);
-    for(it=cities.begin()+1;it!=cities.end();it++)
-    {
+    for(it=cities.begin()+1;it!=cities.end();it++){
         ncity=*it;
         tourLength+=distance(pcity1,ncity);
 
@@ -395,15 +394,33 @@ void createOriginalDistanceGraph(){
    }
 }
 
+vector<double> Lprima;
+double normal(vector<int> cities_id,vector<double> list_Cities) {
+  double normal;
+  int counter;
+  for (size_t i = 0; i < cities_id.size()-1; i++) {
+    for (size_t j = i; j < cities_id.size()-1; j++) {
+      double distance = getDistance(cities_id[i],cities_id[j + 1]);
+      if (distance != 0) {
+        counter++;
+        //cout << counter << " " << i << ":"<< cities_id[i] << "-" <<cities_id[j + 1] << " = " <<distance <<"\n";
+        list_Cities.push_back(distance );
+        //cout << counter << " " << i << ":"<< cities_id[i] << "-" <<cities_id[j + 1] << " = " <<list_Cities[counter] <<"\n";
+      }
 
-double normal(vector<double> dist) {
-  return std::accumulate(dist.begin(), dist.end(), 0.);
-  //return 0;
+      tempDistance = 0;
+    }
+  }
+  sort(list_Cities.begin(), list_Cities.end(), greater<int>());
+  list_Cities.resize(cities_id.size() - 1);
+  Lprima = list_Cities;
+  return std::accumulate(list_Cities.begin(), list_Cities.end(), 0.);
 }
+
 
 double weightFunction(vector<double> dist, double norm) {
   double weight;
-  for (size_t i = 2; i < dist.size()-1; i++) {
+  for (size_t i = 1; i < dist.size()-1; i++) {
     weight = std::accumulate(dist.begin(), dist.end(), 0.) ;
   }
   return weight/norm;
@@ -416,7 +433,7 @@ int main ( int argc, char *argv[] ){
   createOriginalDistanceGraph();
   vector<int> points = generate_Vector((char *) argv[1]);
   vector<double> L;
-  vector<double> L_prima;
+
   //open_DB(points,"distance","connections","id_city_1","id_city_2");
 
   int rows =  sizeof originalGraph / sizeof originalGraph[0];
@@ -424,29 +441,46 @@ int main ( int argc, char *argv[] ){
 
   for (size_t i = 0; i < points.size()-1; i++) {
     L.push_back(getDistance(points[i],points[i + 1 ]) );
-    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " : " <<getDistance(points[i],points[i + 1 ]) <<"\n";
+    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " = " <<getDistance(points[i],points[i + 1 ]) <<"\n";
     tempDistance = 0;
   }
 
-  instance = L;
-  double max = *max_element(L.begin(), L.end());
+//std::cout << "0. size: " << L.size() << '\n';
+/*
+  for (size_t i = 0; i < L.size(); i++) {
+    printf("Imprimiendo L %d-%d -> %2.9f\n",points[i] , points[i + 1], L[i] );
+  }
+*/
+  instance = Lprima;
 
+  //double max = *max_element(L.begin(), L.end());
+/*
   for (size_t i = 0; i < points.size()-1; i++) {
     if (instance[i] == 0) {
       instance[i] = originalGraph[i][i + 1] * max;
     }
     //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " : " <<instance[i]<<"\n";
   }
+*/
+  double normalizer = normal(points,Lprima);
+  double max = *max_element(Lprima.begin(), Lprima.end());
+  for (size_t i = 0; i < Lprima.size()-1; i++) {
+    if (L[i] == 0) {
+      Lprima[i] = Lprima[i] * max;
+    }
+    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " : " <<instance[i]<<"\n";
+  }
+  double cost = weightFunction(Lprima,normalizer);
+  printf("Evaluation: %2.9f \n",cost );
+  printf("MAX: %2.9f \n",max );
+  printf("NORM: %2.9f \n",normalizer );
 
+/*
+  for (size_t i = 0; i < points.size(); i++) {
+    printf("%d-%d Lprima -> %2.9f\n",points[i] , points[i + 1], L[i] );
+  }
+*/
 
-  cout<<"Max distance: "<<max<<endl;
-
-  double normalizer = normal(L);
-  cout<<"Normalizer: "<<normalizer<<endl;
-
-  double cost = weightFunction(instance,normalizer);
-  cout<<"Evaluation: "<<cost<<endl;
-  std::cout << '\n' << ' ';
 
   //for (vector<double>::iterator it = instance.begin() ; it != instance.end(); ++it){
   //  cout << "\t" << *it ;
@@ -460,7 +494,7 @@ int main ( int argc, char *argv[] ){
   //prob1.inputData();
   //createOriginalDistanceGraph();
 
-  //print(L);
+  //print(Lprima);
 
   numOfCities=instance.size();
 
@@ -520,8 +554,15 @@ int main ( int argc, char *argv[] ){
       //cout<<"the best solution is "<<bestTourLength<<"\n";
     }
     fs.close();
-  cout<<"Solution: "<<bestTourLength<<"\n";
-  cout<<" Minimum: "<<minimum<<"\n";
+  printf("Solution: %2.9f \n",bestTourLength );
+  printf("Minumum: %2.9f \n",minimum );
+
+  int feasible = ((bestTourLength > 1) ? 0 : 1);
+  if (feasible==0) {
+    cout<<" FEASIBLE: "<<"YES"<<"\n";
+  } else {
+    cout<<" FEASIBLE: "<<"NO"<<"\n";
+  }
   return 0;
 
 
