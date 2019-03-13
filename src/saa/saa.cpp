@@ -15,7 +15,7 @@
 #define PI 3.14159265
 
 
-int originalGraph[1092][1092];
+static int originalGraph[1092][1092];
 using namespace std;
 
 //g++ saa.cpp -l sqlite3 -o saa
@@ -373,13 +373,12 @@ std::vector <int> generate_Vector(char instancias[]) {
 
   	return temp_arr;
 }
-
-double CalculateDistance(int lat_U,int lat_V,int long_U,int long_V){
+//double calculateDistance(int lat_U,int lat_V,int long_U,int long_V){
+double calculateDistance(int u,int v){
    //d(u, v) = R × C.
-   double A = sin( pow(((latitude[lat_V] - latitude[lat_U])/2),2 ) ) + cos(latitude[lat_U]) * cos(latitude[lat_V]) * sin(pow(((longitude[long_V] - longitude[long_U])/2),2 ));
-   double C = 2 * atan2(sqrt(A),sqrt((1-A)));  //2 × arctan( A, 1 − A). sqrt(x)
-   double natural_distance = R * C;
-   return natural_distance;
+   double A = sin( pow(((latitude[v-1] - latitude[u-1])/2),2 ) ) + cos(latitude[u-1]) * cos(latitude[v-1]) * sin(pow(((longitude[v-1] - longitude[u-1])/2),2 ));
+   double C = 2 * atan2(sqrt(A),sqrt(1-A));  //2 × arctan( A, 1 − A). sqrt(x)
+   return R * C;
 }
 
 void createOriginalDistanceGraph(){
@@ -388,7 +387,7 @@ void createOriginalDistanceGraph(){
        originalGraph[i][i]=0;
 
        for(j=i+1;j<latitude.size();j++){
-         originalGraph[i][j]=CalculateDistance(i,j,i,j );
+         originalGraph[i][j]=calculateDistance(i,j );
          originalGraph[j][i]=originalGraph[i][j];
        }
    }
@@ -420,9 +419,7 @@ double normal(vector<int> cities_id,vector<double> list_Cities) {
 
 double weightFunction(vector<double> dist, double norm) {
   double weight;
-  for (size_t i = 1; i < dist.size()-1; i++) {
-    weight = std::accumulate(dist.begin(), dist.end(), 0.) ;
-  }
+  weight = std::accumulate(dist.begin(), dist.end(), 0.) ;
   return weight/norm;
 }
 
@@ -430,12 +427,9 @@ double weightFunction(vector<double> dist, double norm) {
 int main ( int argc, char *argv[] ){
   generate_Vectors("latitude","cities");
   generate_Vectors("longitude","cities");
-  createOriginalDistanceGraph();
+  //createOriginalDistanceGraph();
   vector<int> points = generate_Vector((char *) argv[1]);
   vector<double> L;
-
-  //open_DB(points,"distance","connections","id_city_1","id_city_2");
-
   int rows =  sizeof originalGraph / sizeof originalGraph[0];
   int cols = sizeof originalGraph[0] / sizeof(int);
 
@@ -445,47 +439,41 @@ int main ( int argc, char *argv[] ){
     tempDistance = 0;
   }
 
-//std::cout << "0. size: " << L.size() << '\n';
+
+  //double calculateDistance(int lat_U,int lat_V,int long_U,int long_V)
+  int p1 = 1;
+  int p2 = 7;
+  printf("Distancia calculada, punto: (%d-%d) = %2.9f\n", p1, p2,calculateDistance(p1,p2));
+
+
+  instance = L;
 /*
   for (size_t i = 0; i < L.size(); i++) {
     printf("Imprimiendo L %d-%d -> %2.9f\n",points[i] , points[i + 1], L[i] );
   }
 */
-  instance = Lprima;
-
-  //double max = *max_element(L.begin(), L.end());
-/*
-  for (size_t i = 0; i < points.size()-1; i++) {
-    if (instance[i] == 0) {
-      instance[i] = originalGraph[i][i + 1] * max;
-    }
-    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " : " <<instance[i]<<"\n";
-  }
-*/
   double normalizer = normal(points,Lprima);
   double max = *max_element(Lprima.begin(), Lprima.end());
-  for (size_t i = 0; i < Lprima.size()-1; i++) {
-    if (L[i] == 0) {
-      Lprima[i] = Lprima[i] * max;
+  instance = L;
+  for (size_t i = 0; i < instance.size(); i++) {
+    if (instance[i] == 0) {
+      instance[i] = calculateDistance(i,i+1) * max;
     }
-    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " : " <<instance[i]<<"\n";
+    //printf("Distancia calculada - L |%d->   %2.9f             :   %2.9f\n",i ,instance[i],L[i]);
   }
-  double cost = weightFunction(Lprima,normalizer);
+
+
+
+  double cost = weightFunction(instance,normalizer);
   printf("Evaluation: %2.9f \n",cost );
   printf("MAX: %2.9f \n",max );
   printf("NORM: %2.9f \n",normalizer );
-
+  return 0;
 /*
-  for (size_t i = 0; i < points.size(); i++) {
-    printf("%d-%d Lprima -> %2.9f\n",points[i] , points[i + 1], L[i] );
+  for (size_t i = 0; i < instance.size(); i++) {
+    printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
   }
 */
-
-
-  //for (vector<double>::iterator it = instance.begin() ; it != instance.end(); ++it){
-  //  cout << "\t" << *it ;
-  //}
-
   std::cout << '\n' << ' ';
   int i;
 
