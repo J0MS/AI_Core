@@ -373,10 +373,10 @@ std::vector <int> generate_Vector(char instancias[]) {
 
   	return temp_arr;
 }
-//double calculateDistance(int lat_U,int lat_V,int long_U,int long_V){
+//d(u, v) = R × C.
 double calculateDistance(int u,int v){
-   //d(u, v) = R × C.
-   double A = sin( pow(((latitude[v-1] - latitude[u-1])/2),2 ) ) + cos(latitude[u-1]) * cos(latitude[v-1]) * sin(pow(((longitude[v-1] - longitude[u-1])/2),2 ));
+   //double A = sin( pow(((latitude[v-1] - latitude[u-1])/2),2 ) ) + cos(latitude[u-1]) * cos(latitude[v-1]) * sin(pow(((longitude[v-1] - longitude[u-1])/2),2 ));
+   double A =  pow(sin(((latitude[v-1] - latitude[u-1])/2)),2 ) + cos(latitude[u-1]) * cos(latitude[v-1]) *  pow( (sin((longitude[v-1] - longitude[u-1])/2)),2 );
    double C = 2 * atan2(sqrt(A),sqrt(1-A));  //2 × arctan( A, 1 − A). sqrt(x)
    return R * C;
 }
@@ -441,25 +441,26 @@ int main ( int argc, char *argv[] ){
 
 
   //double calculateDistance(int lat_U,int lat_V,int long_U,int long_V)
-  int p1 = 1;
-  int p2 = 7;
-  printf("Distancia calculada, punto: (%d-%d) = %2.9f\n", p1, p2,calculateDistance(p1,p2));
+  int p1 = 981;
+  int p2 = 1037;
+  printf("Distancia calculada, ( punto %d-%d) = %2.9f\n", p1, p2,calculateDistance(p1,p2));
 
 
-  instance = L;
+
 /*
   for (size_t i = 0; i < L.size(); i++) {
     printf("Imprimiendo L %d-%d -> %2.9f\n",points[i] , points[i + 1], L[i] );
   }
 */
+
   double normalizer = normal(points,Lprima);
   double max = *max_element(Lprima.begin(), Lprima.end());
   instance = L;
   for (size_t i = 0; i < instance.size(); i++) {
     if (instance[i] == 0) {
-      instance[i] = calculateDistance(i,i+1) * max;
+      instance[i] = calculateDistance(points[i],points[i + 1])* max;
     }
-    //printf("Distancia calculada - L |%d->   %2.9f             :   %2.9f\n",i ,instance[i],L[i]);
+    //printf("Distancia calculada - L |id: %d|%d-%d->   %2.9f             :  ,%2.9f\n",i,points[i],points[i+1] ,instance[i],L[i]);
   }
 
 
@@ -468,7 +469,7 @@ int main ( int argc, char *argv[] ){
   printf("Evaluation: %2.9f \n",cost );
   printf("MAX: %2.9f \n",max );
   printf("NORM: %2.9f \n",normalizer );
-  return 0;
+
 /*
   for (size_t i = 0; i < instance.size(); i++) {
     printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
@@ -496,12 +497,14 @@ int main ( int argc, char *argv[] ){
   int position1=0,position2=0;
   int newTourLength,difference;
   std::fstream fs;
-  fs.open ("tspResults.txt", std::fstream::in | std::fstream::out );
+  fs.open ("Results.txt", std::fstream::in | std::fstream::out );
+  //prob1.inputData();
   for(int rs=0;rs<100;rs++){
       temperature=99999999999999999999999999999999999999999.0; //Initial Temperature
       //temperature=DBL_MAX;
       //cout<<"doing rs "<<rs<<"\n";
       fs<<"[";
+
       while(temperature > absoluteTemperature){
           //cout<<"LOL";
 
