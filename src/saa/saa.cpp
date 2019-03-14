@@ -499,7 +499,7 @@ int main ( int argc, char *argv[] ){
   std::fstream fs;
   fs.open ("Results.txt", std::fstream::in | std::fstream::out );
   //prob1.inputData();
-  for(int rs=0;rs<100;rs++){
+  for(int rs=0;rs<1000;rs++){
       temperature=99999999999999999999999999999999999999999.0; //Initial Temperature
       //temperature=DBL_MAX;
       //cout<<"doing rs "<<rs<<"\n";
