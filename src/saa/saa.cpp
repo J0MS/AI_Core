@@ -9,6 +9,7 @@
 #include <vector>
 #include <math.h>
 #include <cmath>
+#include <cstdlib>
 #include <numeric>
 
 #define R 6373000 //Planet radius
@@ -21,9 +22,11 @@ using namespace std;
 //g++ saa.cpp -l sqlite3 -o saa
 
 vector<int> cities;
+vector<int> currentSolution;
+vector<int> finalSolution;
 vector<int> finalOrder;
 int arr[40];// arr is the array that stores the City order
-int numOfCities;
+int numofCities;
 //double planetRadius = 6373000;
 vector<double>distances;
 vector<double>latitude;
@@ -74,7 +77,7 @@ double getRandomNumber(double i,double j){
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     default_random_engine generator (seed);
     uniform_real_distribution<double> distribution (i,j);
-    //cout<<"returning "<<(double(distribution(generator)))<<"\n";
+    //cout<<"returning random number:"<<(double(distribution(generator)))<<"\n";
     return double(distribution(generator));
 }
 
@@ -103,45 +106,30 @@ int getTourLength() {
     return tourLength;
 }
 
-void swap(int i,int j){
-    int temp=arr[i];
-    arr[i]=arr[j];
-    arr[j]=temp;
+void swap(vector<int> cities_vector,int i,int j){
+    int temp=cities_vector[i];
+    cities_vector[i]=cities_vector[j];
+    cities_vector[j]=temp;
 }
 
+int rdtsc(){
+__asm__ __volatile__("rdtsc");
+}
 
-int getNearestNeighbourTour() {
-    vector<int>::iterator it;
-    int numCities=numOfCities,i,j;
+vector<int> generatenewPath(vector<int> cities_id) {
+  double normal;
+  int counter;
+  int rand1 = (int) round(getRandomNumber(0,cities_id.size() -1));
+  int rand2 = (int) round(getRandomNumber(0,cities_id.size() -1));
 
-    for(i=0;i<numCities;i++)
-    {
-        arr[i]=i;
-        //cout<<"arr is "<<i<<"\n";
-    }
-    int best,bestIndex;
-    for(i=1;i<numCities;i++)
-    {
-        best=INT_MAX;
-        for(j=i;j<numCities;j++)
-        {
-            if(distance(i-1,j)<best)
-            {
-                best=distance(i,j);
-                bestIndex=j;
-            }
-        }
-        swap(i,bestIndex);
-    }
-    cities.clear();
-    for(i=1;i<numCities;i++)
-    {
-        cities.push_back(arr[i]);
-        finalOrder.push_back(arr[i]);
-    }
+  printf("Aleatorios generados %d-%d\n", rand1, rand2);
 
-    int nearestNeighbourTourLength=getTourLength();
-    return nearestNeighbourTourLength;
+  int temp=cities_id[rand1];
+  cities_id[rand1]=cities_id[rand2];
+  cities_id[rand2]=temp;
+
+  //int nearestNeighbourTourLength=getTourLength();
+  return cities_id;
 }
 
 void swap2(int i,int j)
@@ -203,6 +191,8 @@ double getDistance(int id1, int id2) {
    sqlite3_close(db);
   return tempDistance;
 }
+
+
 
 
 //tempDistances.push_back(statement3);
@@ -306,52 +296,9 @@ void generate_Vectors(std::string field, std::string table) {
 }
 
 //
-void open_DB(vector<int> points,std::string field , std::string table, std::string cond1, std::string cond2  ) {
-   sqlite3 *db;//
-   char *zErrMs;//g = 0;
-   //int rc;
-   char *sql,*sql2;
-   int x,y,rc;
-   const char* data = "Callback function called";
-   /* Open database */
-   rc = sqlite3_open("data.sqlite", &db);
-
-   if( rc ) {
-      fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-   } //else {
-    //  fprintf(stderr, "Opened database successfully\n");
-  // }
-
-std::string statement = "SELECT latitude,longitude FROM cities WHERE id ='1092';";
-//std::string statement2 = "SELECT longitude FROM cities WHERE id ='1092';";
-
-      for(std::size_t i=0; i<points.size(); i++){
-        x  = points[i];
-   		  y = points[i+1];
-        if (x == points.back() ) {
-          break;
-        }
-      //std::string field = "distance";
-      auto result = "SELECT " + field +" FROM "+ table + " WHERE "+ cond1 + "='" + std::to_string(x) +"'" + " AND " +  cond2 + " ='"  + std::to_string(y) +"';";
-
-  //    sql = (char *) statement.c_str();
-      //sql = (char *) result.c_str();
-       /* Execute SQL statement */
-    //  rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
 
 
-  //    sql2 = (char *) statement2.c_str();
-      //sql = (char *) result.c_str();
-       /* Execute SQL statement */
-//      rc = sqlite3_exec(db, sql2, callback2, (void*)data, &zErrMsg);
-
- 	}
-
-      fprintf(stdout, "Operation done successfully\n");
-   sqlite3_close(db);
-}
-
-std::vector <int> generate_Vector(char instancias[]) {
+std::vector <int> read_citiesList(char instancias[]) {
 	std::vector <int> temp_arr;
   std::ifstream inFile(instancias);
     if (inFile.is_open()){
@@ -393,6 +340,18 @@ void createOriginalDistanceGraph(){
    }
 }
 
+void updateCitiesCost(vector<int> cities_id,vector<double> list_Cities) {
+  for (size_t i = 0; i < cities_id.size()-1; i++) {
+    for (size_t j = i; j < cities_id.size()-1; j++) {
+      double distance = getDistance(cities_id[i],cities_id[j + 1]);
+      list_Cities.push_back(distance );
+
+      tempDistance = 0;
+    }
+  }
+
+}
+
 vector<double> Lprima;
 double normal(vector<int> cities_id,vector<double> list_Cities) {
   double normal;
@@ -402,7 +361,6 @@ double normal(vector<int> cities_id,vector<double> list_Cities) {
       double distance = getDistance(cities_id[i],cities_id[j + 1]);
       if (distance != 0) {
         counter++;
-        //cout << counter << " " << i << ":"<< cities_id[i] << "-" <<cities_id[j + 1] << " = " <<distance <<"\n";
         list_Cities.push_back(distance );
         //cout << counter << " " << i << ":"<< cities_id[i] << "-" <<cities_id[j + 1] << " = " <<list_Cities[counter] <<"\n";
       }
@@ -427,8 +385,9 @@ double weightFunction(vector<double> dist, double norm) {
 int main ( int argc, char *argv[] ){
   generate_Vectors("latitude","cities");
   generate_Vectors("longitude","cities");
-  //createOriginalDistanceGraph();
-  vector<int> points = generate_Vector((char *) argv[1]);
+  createOriginalDistanceGraph();
+  vector<int> points = read_citiesList((char *) argv[1]);
+
   vector<double> L;
   int rows =  sizeof originalGraph / sizeof originalGraph[0];
   int cols = sizeof originalGraph[0] / sizeof(int);
@@ -439,13 +398,7 @@ int main ( int argc, char *argv[] ){
     tempDistance = 0;
   }
 
-
-  //double calculateDistance(int lat_U,int lat_V,int long_U,int long_V)
-  int p1 = 981;
-  int p2 = 1037;
-  printf("Distancia calculada, ( punto %d-%d) = %2.9f\n", p1, p2,calculateDistance(p1,p2));
-
-
+currentSolution=generatenewPath(points);
 
 /*
   for (size_t i = 0; i < L.size(); i++) {
@@ -453,12 +406,12 @@ int main ( int argc, char *argv[] ){
   }
 */
 
-  double normalizer = normal(points,Lprima);
+  double normalizer = normal(currentSolution,Lprima);
   double max = *max_element(Lprima.begin(), Lprima.end());
   instance = L;
   for (size_t i = 0; i < instance.size(); i++) {
     if (instance[i] == 0) {
-      instance[i] = calculateDistance(points[i],points[i + 1])* max;
+      instance[i] = calculateDistance(currentSolution[i],currentSolution[i + 1])* max;
     }
     //printf("Distancia calculada - L |id: %d|%d-%d->   %2.9f             :  ,%2.9f\n",i,points[i],points[i+1] ,instance[i],L[i]);
   }
@@ -469,7 +422,7 @@ int main ( int argc, char *argv[] ){
   printf("Evaluation: %2.9f \n",cost );
   printf("MAX: %2.9f \n",max );
   printf("NORM: %2.9f \n",normalizer );
-
+return 0;
 /*
   for (size_t i = 0; i < instance.size(); i++) {
     printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
@@ -485,20 +438,23 @@ int main ( int argc, char *argv[] ){
 
   //print(Lprima);
 
-  numOfCities=instance.size();
+  numofCities=instance.size();
 
+std::cout << "1. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
+std::cout << "2. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
+std::cout << "3. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
 
-//return 0;
   //Generate the initial city tour and get the  nearestNeighbourTourLength
-  int bestTourLength=getNearestNeighbourTour(); //start with a random(better) point
+//int bestTourLength=generatenewPath(points, Lprima); //start with a random(better) point
 
+return 0;
+int bestTourLength;
   if(minimum > bestTourLength ) minimum=bestTourLength;
   double temperature,coolingRate=0.9,absoluteTemperature=0.00001,probability;
   int position1=0,position2=0;
   int newTourLength,difference;
   std::fstream fs;
   fs.open ("Results.txt", std::fstream::in | std::fstream::out );
-  //prob1.inputData();
   for(int rs=0;rs<1000;rs++){
       temperature=99999999999999999999999999999999999999999.0; //Initial Temperature
       //temperature=DBL_MAX;
@@ -509,35 +465,16 @@ int main ( int argc, char *argv[] ){
           //cout<<"LOL";
 
 
-          position1=int(getRandomNumber(0,numOfCities-1));
-          position2=int(getRandomNumber(0,numOfCities-1));
-          while(position1==position2 or( (position1>numOfCities-2) or (position2>numOfCities-2)))
+          position1=int(getRandomNumber(0,numofCities-1));
+          position2=int(getRandomNumber(0,numofCities-1));
+          while(position1==position2 or( (position1>numofCities-2) or (position2>numofCities-2)))
           {
-              position1=int(getRandomNumber(0,numOfCities-2));
-              position2=int(getRandomNumber(0,numOfCities-2));
+              position1=int(getRandomNumber(0,numofCities-2));
+              position2=int(getRandomNumber(0,numofCities-2));
 
           }
-          //cout<<"position1 is "<<position1<<" position2 is "<<position2<<"\n";
-          swap2(position1,position2);
-          it2=cities.begin();
-          if(position2 > position1)
-          random_shuffle(it2+position1,it2+position2);
-          newTourLength=getTourLength();
-          if(minimum > newTourLength ) minimum=newTourLength;
-          fs<<newTourLength<<",";
-          //cout<<"current tour length is "<<newTourLength<<" n bestTourLength is "<<bestTourLength<<"\n\n";
-          difference=newTourLength-bestTourLength;
+          cout<<"position1 is "<<position1<<" position2 is "<<position2<<"\n";
 
-          if(difference <0 or (difference >0 and  getProbability(difference,temperature) > getRandomNumber(0,1))){
-              finalOrder.clear();
-
-              for(it=cities.begin();it!=cities.end();it++)
-              {
-                  finalOrder.push_back(*it);
-              }
-              bestTourLength=difference+bestTourLength;
-          }
-          temperature=temperature*coolingRate;
 
       }
       fs<<"]\n";
@@ -547,6 +484,14 @@ int main ( int argc, char *argv[] ){
     fs.close();
   printf("Solution: %2.9f \n",bestTourLength );
   printf("Minumum: %2.9f \n",minimum );
+
+  //for (size_t i = 0; i < finalOrder.size(); i++) {
+  //  printf("Imprimiendo final order %d-%d|    L:%d   ->   %2.9f\n",(int)i,finalOrder[i] );
+  //}
+
+  //double cost2 = weightFunction(finalOrder,normalizer);
+  //printf("Evaluation: %2.9f \n",cost2 );
+
 
   int feasible = ((bestTourLength > 1) ? 0 : 1);
   if (feasible==0) {
