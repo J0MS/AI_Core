@@ -398,7 +398,7 @@ int main ( int argc, char *argv[] ){
     tempDistance = 0;
   }
 
-currentSolution=generatenewPath(points);
+//currentSolution=generatenewPath(points);
 
 /*
   for (size_t i = 0; i < L.size(); i++) {
@@ -406,17 +406,23 @@ currentSolution=generatenewPath(points);
   }
 */
 
-  double normalizer = normal(currentSolution,Lprima);
-  double max = *max_element(Lprima.begin(), Lprima.end());
+  //double normalizer = normal(points,Lprima);
+  //double max = *max_element(Lprima.begin(), Lprima.end());
+  double normalizer = 173613497.689999968;
+  double max = 4940077.590000000;
   instance = L;
   for (size_t i = 0; i < instance.size(); i++) {
     if (instance[i] == 0) {
-      instance[i] = calculateDistance(currentSolution[i],currentSolution[i + 1])* max;
+      instance[i] = calculateDistance(points[i],points[i + 1])* max;
     }
     //printf("Distancia calculada - L |id: %d|%d-%d->   %2.9f             :  ,%2.9f\n",i,points[i],points[i+1] ,instance[i],L[i]);
   }
 
-
+  /*
+  for (size_t i = 0; i < instance.size(); i++) {
+    printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
+  }
+  */
 
   double cost = weightFunction(instance,normalizer);
   printf("Evaluation: %2.9f \n",cost );
