@@ -3,29 +3,31 @@
 #include <chrono>
 #include <fstream>
 #include <sqlite3.h>
+#include "jarro2783/cxxopts.hpp"
 #include "matrix.hpp"
 #include "saa.hpp"
 
 using namespace std;
 
-// DB FILE PATH
-#define DBPATH "../data/tsp.db"
 
-// NUMBER OF CITIES TO READ FROM DB
-#define N 1092
 
-// GETS EXECUTED FOR EACH ROW OF THE DB QUERY RESULT.
+
+//Full graph
+#define NUMBER_OF_CITIES 1092
+#define DBREPOSITORY "../data/tsp.db"
+
+// Callback function for open DB.
 static int callback(void *, int, char **, char **);
 
-int main(int argc, char** argv)
-{
-  auto gstart = chrono::steady_clock::now();
-  int sseed=0, eseed=10;
+int main(int argc, char** argv){
+  cout << "epic ref 17 num num_cities solved!" << endl;
+  auto currentseed = chrono::steady_clock::now();
+  int fisrt_seed=0, last_seed=10; //How many seeds?
   istream *is = &cin;
   ifstream inFile;
   bool hybrid=false, sweep=true, verbose=false;
 
-  cxxopts::Options options(argv[0], "TSP problem solution using simmulated annealing heuristic.");
+  cxxopts::Options options(argv[0], "TSP problem solution using simmulated saa heuristic.");
   try
   {
     options
@@ -49,6 +51,22 @@ int main(int argc, char** argv)
       inFile.open(result["f"].as<string>());
       is = &inFile;
     }
+    if (result.count("s"))
+    {
+      fisrt_seed = result["s"].as<int>();
+    }
+    if (result.count("e"))
+    {
+      last_seed = result["e"].as<int>();
+    }
+    if (result.count("use-hybrid"))
+    {
+      hybrid = true;
+    }
+    if (result.count("final-sweep"))
+    {
+      sweep = false;
+    }
     if (result.count("v"))
     {
       verbose = true;
@@ -59,15 +77,15 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  // NUMBER OF CITIES
-  const int n = N;
-  Annealing annealing(n);
+  // NUMBER_OF_CITIES
+  const int num_cities = NUMBER_OF_CITIES;
+  SAA saa(num_cities);
 
-  // --DATABASE READ SECTION--
+  //Loading db
   sqlite3 *db;
   char *zErrMsg = 0;
   int rc;
-  rc = sqlite3_open(DBPATH, &db);
+  rc = sqlite3_open(DBREPOSITORY, &db);
   char sql[200];
 
   if (rc)
@@ -80,9 +98,9 @@ int main(int argc, char** argv)
         FROM (SELECT * FROM cities LIMIT %d) A \
         LEFT JOIN (SELECT * FROM connections) B \
         ON A.id=B.id_city_1 AND B.id_city_2<=%d;",
-          n, n);
+          num_cities, num_cities);
 
-  rc = sqlite3_exec(db, sql, callback, &annealing, &zErrMsg);
+  rc = sqlite3_exec(db, sql, callback, &saa, &zErrMsg);
 
   if (rc != SQLITE_OK)
   {
@@ -93,7 +111,7 @@ int main(int argc, char** argv)
   // --END DATABASE READ SECTION--
 
   string s;
-  vector<int> S;
+  vector<int> currentSolution;
 
   // READ TEST CASES FROM INPUT FILE (COMMA SEPARATED).
   while (getline(*is, s))
@@ -103,17 +121,17 @@ int main(int argc, char** argv)
     ss << s;
     while (getline(ss, s, ','))
     {
-      S.push_back(stoi(s) - 1);
+      currentSolution.push_back(stoi(s) - 1);
     }
     // --END PARSE INPUT--
     // --SIMULATED ANNEALING--
-    for (int seed = sseed; seed < eseed; seed++)
+    for (int seed = fisrt_seed; seed < last_seed; seed++)
     {
       auto start = chrono::steady_clock::now();
       // params: (seed, uniform_int_generator_max)
-      annealing.setRandomEngine(seed, S.size());
+      saa.setRandomEngineGenerator(seed, currentSolution.size());
       // params: (initial_instance, hybrid_sweep?, final_sweep?)
-      pair<vector<int>, double> res = annealing.computeSolution(S, hybrid, sweep, verbose);
+      pair<vector<int>, double> res = saa.getSolution(currentSolution, hybrid, sweep, verbose);
 
       printf("\nSeed: %d\n", seed);
       for (auto i : res.first)
@@ -122,19 +140,19 @@ int main(int argc, char** argv)
       }
       printf("\nEvaluation: %2.9f\n", res.second);
       auto end = chrono::steady_clock::now();
-      printf("Elapsed time: %lld\n", chrono::duration_cast<chrono::seconds>(end - start).count());
+      printf("Elapsed time: %d\n", (int)chrono::duration_cast<chrono::seconds>(end - start).count());
     }
-    S.clear();
+    currentSolution.clear();
     // --END SIMULATED ANNEALING--
   }
   auto gend = chrono::steady_clock::now();
-  printf("Total elapsed time: %lld\n", chrono::duration_cast<chrono::seconds>(gend - gstart).count());
+  printf("Total elapsed time: %d\num_cities", (int)chrono::duration_cast<chrono::seconds>(gend - currentseed).count());
   return 0;
 }
 
-static int callback(void *annealing, int argc, char **argv, char **azColName)
+static int callback(void *saa, int argc, char **argv, char **azColName)
 {
-  Annealing *a = static_cast<Annealing *>(annealing);
+  SAA *a = static_cast<SAA *>(saa);
   if (argv[7] != NULL)
     a->validEdge(stoi(argv[0]) - 1, stoi(argv[7]) - 1, stod(argv[8]));
   a->addCity(stoi(argv[0]) - 1, {stod(argv[4]), stod(argv[5])});
