@@ -119,15 +119,15 @@ __asm__ __volatile__("rdtsc");
 vector<int> generatenewPath(vector<int> cities_id) {
   double normal;
   int counter;
-  int rand1 = (int) round(getRandomNumber(0,cities_id.size() -1));
-  int rand2 = (int) round(getRandomNumber(0,cities_id.size() -1));
+  int i = (int) round(getRandomNumber(0,cities_id.size() -1));
+  int j = (int) round(getRandomNumber(0,cities_id.size() -1));
 
-  printf("Aleatorios generados %d-%d\n", rand1, rand2);
+  printf("Aleatorios generados %d-%d\n", i, j);
 
-  int temp=cities_id[rand1];
-  cities_id[rand1]=cities_id[rand2];
-  cities_id[rand2]=temp;
-
+  int temp=cities_id[i];
+  cities_id[i]=cities_id[j];
+  cities_id[j]=temp;
+  cities_id.clear();
   //int nearestNeighbourTourLength=getTourLength();
   return cities_id;
 }
@@ -392,115 +392,71 @@ int main ( int argc, char *argv[] ){
   int rows =  sizeof originalGraph / sizeof originalGraph[0];
   int cols = sizeof originalGraph[0] / sizeof(int);
 
-  for (size_t i = 0; i < points.size()-1; i++) {
-    L.push_back(getDistance(points[i],points[i + 1 ]) );
-    //cout << " " << i << ":"<< points[i] << "-" <<points[i + 1] << " = " <<getDistance(points[i],points[i + 1 ]) <<"\n";
-    tempDistance = 0;
-  }
-
-currentSolution=generatenewPath(points);
-
-/*
-  for (size_t i = 0; i < L.size(); i++) {
-    printf("Imprimiendo L %d-%d -> %2.9f\n",points[i] , points[i + 1], L[i] );
-  }
-*/
-
-  double normalizer = normal(currentSolution,Lprima);
-  double max = *max_element(Lprima.begin(), Lprima.end());
-  instance = L;
-  for (size_t i = 0; i < instance.size(); i++) {
-    if (instance[i] == 0) {
-      instance[i] = calculateDistance(currentSolution[i],currentSolution[i + 1])* max;
-    }
-    //printf("Distancia calculada - L |id: %d|%d-%d->   %2.9f             :  ,%2.9f\n",i,points[i],points[i+1] ,instance[i],L[i]);
+  currentSolution=generatenewPath(points);
+  for (size_t i = 0; i < points.size(); i++) {
+    printf("Imprimiendo ruta %d-%d|    L:%d   ->   %d\n",points[i] , points[i + 1],(int)i,points[i] );
   }
 
 
-
-  double cost = weightFunction(instance,normalizer);
-  printf("Evaluation: %2.9f \n",cost );
-  printf("MAX: %2.9f \n",max );
-  printf("NORM: %2.9f \n",normalizer );
-return 0;
-/*
-  for (size_t i = 0; i < instance.size(); i++) {
-    printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
+  currentSolution=generatenewPath(points);
+  for (size_t i = 0; i < points.size(); i++) {
+    printf("Imprimiendo ruta %d-%d|    L:%d   ->   %d\n",points[i] , points[i + 1],(int)i,points[i] );
   }
-*/
-  std::cout << '\n' << ' ';
-  int i;
 
-  vector<int>::iterator it,it2;
-  SAA prob1;
-  //prob1.inputData();
-  //createOriginalDistanceGraph();
-
-  //print(Lprima);
-
-  numofCities=instance.size();
-
-std::cout << "1. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
-std::cout << "2. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
-std::cout << "3. random: " << (int) round(getRandomNumber(0,numofCities-1)) << '\n';
-
-  //Generate the initial city tour and get the  nearestNeighbourTourLength
-//int bestTourLength=generatenewPath(points, Lprima); //start with a random(better) point
-
-return 0;
-int bestTourLength;
-  if(minimum > bestTourLength ) minimum=bestTourLength;
-  double temperature,coolingRate=0.9,absoluteTemperature=0.00001,probability;
-  int position1=0,position2=0;
-  int newTourLength,difference;
-  std::fstream fs;
-  fs.open ("Results.txt", std::fstream::in | std::fstream::out );
-  for(int rs=0;rs<1000;rs++){
-      temperature=99999999999999999999999999999999999999999.0; //Initial Temperature
-      //temperature=DBL_MAX;
-      //cout<<"doing rs "<<rs<<"\n";
-      fs<<"[";
-
-      while(temperature > absoluteTemperature){
-          //cout<<"LOL";
-
-
-          position1=int(getRandomNumber(0,numofCities-1));
-          position2=int(getRandomNumber(0,numofCities-1));
-          while(position1==position2 or( (position1>numofCities-2) or (position2>numofCities-2)))
-          {
-              position1=int(getRandomNumber(0,numofCities-2));
-              position2=int(getRandomNumber(0,numofCities-2));
-
-          }
-          cout<<"position1 is "<<position1<<" position2 is "<<position2<<"\n";
-
-
-      }
-      fs<<"]\n";
-      random_shuffle(cities.begin(),cities.end());
-      //cout<<"the best solution is "<<bestTourLength<<"\n";
-    }
-    fs.close();
-  printf("Solution: %2.9f \n",bestTourLength );
-  printf("Minumum: %2.9f \n",minimum );
-
-  //for (size_t i = 0; i < finalOrder.size(); i++) {
-  //  printf("Imprimiendo final order %d-%d|    L:%d   ->   %2.9f\n",(int)i,finalOrder[i] );
-  //}
-
-  //double cost2 = weightFunction(finalOrder,normalizer);
-  //printf("Evaluation: %2.9f \n",cost2 );
-
-
-  int feasible = ((bestTourLength > 1) ? 0 : 1);
-  if (feasible==0) {
-    cout<<" FEASIBLE: "<<"YES"<<"\n";
-  } else {
-    cout<<" FEASIBLE: "<<"NO"<<"\n";
+  currentSolution=generatenewPath(points);
+  for (size_t i = 0; i < points.size(); i++) {
+    printf("Imprimiendo ruta %d-%d|    L:%d   ->   %d\n",points[i] , points[i + 1],(int)i,points[i] );
   }
+
+  currentSolution=generatenewPath(points);
+  for (size_t i = 0; i < points.size(); i++) {
+    printf("Imprimiendo ruta %d-%d|    L:%d   ->   %d\n",points[i] , points[i + 1],(int)i,points[i] );
+
   return 0;
+  for (size_t i = 0; i < 10000; i++) {
+  //  currentSolution=generatenewPath(points);
+    for (size_t i = 0; i < instance.size(); i++) {
+      printf("Imprimiendo solucion! %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
+    }    for (size_t i = 0; i < currentSolution.size()-1; i++) {
+      L.push_back(getDistance(currentSolution[i],currentSolution[i + 1 ]) );
+      //cout << " " << i << ":"<< currentSolution[i] << "-" <<currentSolution[i + 1] << " = " <<getDistance(currentSolution[i],currentSolution[i + 1 ]) <<"\n";
+    //  tempDistance = 0;
+    }
 
+
+
+    double normalizer = normal(currentSolution,Lprima);
+    double max = *max_element(Lprima.begin(), Lprima.end());
+    instance = L;
+    for (size_t i = 0; i < instance.size(); i++) {
+      if (instance[i] == 0) {
+        instance[i] = calculateDistance(currentSolution[i],currentSolution[i + 1])* max;
+      }
+      //printf("Distancia calculada - L |id: %d|%d-%d->   %2.9f             :  ,%2.9f\n",i,points[i],points[i+1] ,instance[i],L[i]);
+    }
+
+
+    double cost = weightFunction(instance,normalizer);
+    int feasible = ((cost <= 1) ? 1 : 0);
+    if (feasible==1) {
+      cout<<" FEASIBLE: "<<"YES"<<"\n";
+      printf("Evaluation: %2.9f \n",cost );
+      printf("MAX: %2.9f \n",max );
+      printf("NORM: %2.9f \n",normalizer );
+      for (size_t i = 0; i < instance.size(); i++) {
+        printf("Imprimiendo instance %d-%d|    L:%d   ->   %2.9f\n",points[i] , points[i + 1],(int)i,instance[i] );
+      }
+      break;
+    } else {
+      cout<<" FEASIBLE: "<<"NO"<<"\n";
+    }
+  }
+
+
+
+
+
+}
 
 
 }
