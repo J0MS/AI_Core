@@ -1,15 +1,15 @@
 project(
-  'TSP_SimmulatedAnnealing',
+  'saa',
   'cpp', default_options : ['cpp_std=c++11'])
 
-incdir = include_directories('include')
+lib = include_directories('include')
 
 sqlite3 = dependency('sqlite3')
 
-src = ['src/Annealing.cpp', 'src/Graph.cpp', 'src/Main.cpp']
+src = ['src/saa.cpp', 'src/matrix.cpp', 'src/Main.cpp']
 
 executable(
-  'TSP_SimmulatedAnnealing',
+  'saa',
   src,
-  include_directories : incdir,
+  include_directories : lib,
   dependencies : sqlite3)

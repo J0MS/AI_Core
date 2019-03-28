@@ -39,64 +39,11 @@ pair<vector<int>, double> SAA::getSolution(vector<int> &currentSolution, bool hy
   this->generatenewPath(currentSolution);
   double temperature = this->initialTemperature(INIT_T, MIN_INIT_ACC_P);
   this->acceptancebyThresholds(temperature, hybrid, verbose);
-  if (sweep)
-  {
-    this->computeSweep();
-  }
+  
   return {this->minimum_solution, this->minimum_cost};
 }
 
-void SAA::computeSweep(){
-  bool improved = true;
-  double minCost = this->minimum_cost * this->normalizer;
-  double originalCost;
-  double actualCost;
 
-  while (improved)
-  {
-    improved = false;
-    this->s = this->minimum_solution;
-    originalCost = minCost;
-    for (int i = 0; i < (int)this->s.size(); i++)
-    {
-      for (int j = i + 1; j < (int)this->s.size(); j++)
-      {
-        actualCost = originalCost;
-        if (i != j - 1)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[i], this->s[i + 1]);
-          actualCost -= this->full_Graphic.getDistance(this->s[j - 1], this->s[j]);
-          actualCost += this->full_Graphic.getDistance(this->s[j], this->s[i + 1]);
-          actualCost += this->full_Graphic.getDistance(this->s[j - 1], this->s[i]);
-        }
-        if (i != 0)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[i - 1], this->s[i]);
-          actualCost += this->full_Graphic.getDistance(this->s[i - 1], this->s[j]);
-        }
-        if (j != (int)this->s.size() - 1)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[j], this->s[j + 1]);
-          actualCost += this->full_Graphic.getDistance(this->s[i], this->s[j + 1]);
-        }
-        if (actualCost < minCost)
-        {
-          this->s[i] = this->s[i] + this->s[j];
-          this->s[j] = this->s[i] - this->s[j];
-          this->s[i] = this->s[i] - this->s[j];
-          improved = true;
-          minCost = actualCost;
-          this->minimum_solution = this->s;
-
-          this->s[i] = this->s[i] + this->s[j];
-          this->s[j] = this->s[i] - this->s[j];
-          this->s[i] = this->s[i] - this->s[j];
-        }
-      }
-    }
-  }
-  this->minimum_cost = minCost / this->normalizer;
-}
 
 double SAA::weightFunction(vector<int> &currentSolution){
   double sum = 0;
@@ -179,23 +126,7 @@ double SAA::calculateBatch(double T, bool hybrid, bool verbose){
     sp.swap(get_neighbour.first);
     double neighbour_cost = get_neighbour.second;
 
-    // Use to sweep to find local min.
-    if (hybrid && neighbour_cost < this->minimum_cost)
-    {
-      if(verbose)
-      {
-        printf("%2.9f\num_cities", neighbour_cost);
-      }
-      sp.swap(this->minimum_solution);
-      this->minimum_cost = neighbour_cost;
-      this->computeSweep();
-
-      this->s = this->minimum_solution;
-      solution_cost = this->minimum_cost;
-      c += 1;
-      r += solution_cost;
-      continue;
-    }
+   
 
     if (neighbour_cost < solution_cost + T)
     {

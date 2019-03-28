@@ -51,26 +51,7 @@ int main(int argc, char** argv){
       inFile.open(result["f"].as<string>());
       is = &inFile;
     }
-    if (result.count("s"))
-    {
-      fisrt_seed = result["s"].as<int>();
-    }
-    if (result.count("e"))
-    {
-      last_seed = result["e"].as<int>();
-    }
-    if (result.count("use-hybrid"))
-    {
-      hybrid = true;
-    }
-    if (result.count("final-sweep"))
-    {
-      sweep = false;
-    }
-    if (result.count("v"))
-    {
-      verbose = true;
-    }
+
   } catch (const cxxopts::OptionException& e)
   {
     cout << "Error parsing options: " << e.what() << endl;
@@ -140,7 +121,7 @@ int main(int argc, char** argv){
       }
       printf("\nEvaluation: %2.9f\n", res.second);
       auto end = chrono::steady_clock::now();
-      printf("Elapsed time: %d\n", (int)chrono::duration_cast<chrono::seconds>(end - start).count());
+      printf("Time: %d\n", (int)chrono::duration_cast<chrono::seconds>(end - start).count());
     }
     currentSolution.clear();
     // --END SIMULATED ANNEALING--
