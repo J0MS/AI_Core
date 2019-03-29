@@ -1,5 +1,5 @@
-#ifndef ANNEALING_H
-#define ANNEALING_H
+#ifndef SAA_H
+#define SAA_H
 
 #include "bits/stdc++.h"
 #include <stdio.h>
@@ -49,8 +49,8 @@ public:
   double weightFunction(vector<int> &);
   void generatenewPath(vector<int> &);
   pair<vector<int>, double> get_neighbour(double);
-  double calculateBatch(double, bool, bool);
-  void acceptancebyThresholds(double, bool, bool);
+  double calculateBatch(double, bool);
+  void acceptancebyThresholds(double, bool);
   double initialTemperature(double, double);
   double percentageofAccepted(double);
   double binarySearch(double, double, double);
@@ -60,9 +60,9 @@ public:
 public:
   SAA(int);
   void setRandomEngineGenerator(int, int);
-  void validEdge(int, int, double);
-  void addCity(int, pair<double, double>);
-  pair<vector<int>, double> getSolution(vector<int> &, bool, bool, bool);
+  void real_connection(int, int, double);
+  void add_cityID(int, pair<double, double>);
+  pair<vector<int>, double> getSolution(vector<int> &, bool);
 };
 
 #endif

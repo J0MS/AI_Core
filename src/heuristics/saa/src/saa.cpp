@@ -29,74 +29,19 @@ void SAA::setRandomEngineGenerator(int seed, int size){
   this->uid = uid;
 }
 
-pair<vector<int>, double> SAA::getSolution(vector<int> &currentSolution, bool hybrid, bool sweep, bool verbose){
+pair<vector<int>, double> SAA::getSolution(vector<int> &currentSolution, bool verbose){
   this->normalizer = 0;
   this->max = 0;
   this->minimum_cost = numeric_limits<double>::max(); // get Infinite!
-
   this->normal(currentSolution);
   this->createOriginalDistanceGraph();
   this->generatenewPath(currentSolution);
   double temperature = this->initialTemperature(INIT_T, MIN_INIT_ACC_P);
-  this->acceptancebyThresholds(temperature, hybrid, verbose);
-  if (sweep)
-  {
-    this->computeSweep();
-  }
+  this->acceptancebyThresholds(temperature, verbose);
   return {this->minimum_solution, this->minimum_cost};
 }
 
-void SAA::computeSweep(){
-  bool improved = true;
-  double minCost = this->minimum_cost * this->normalizer;
-  double originalCost;
-  double actualCost;
 
-  while (improved)
-  {
-    improved = false;
-    this->s = this->minimum_solution;
-    originalCost = minCost;
-    for (int i = 0; i < (int)this->s.size(); i++)
-    {
-      for (int j = i + 1; j < (int)this->s.size(); j++)
-      {
-        actualCost = originalCost;
-        if (i != j - 1)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[i], this->s[i + 1]);
-          actualCost -= this->full_Graphic.getDistance(this->s[j - 1], this->s[j]);
-          actualCost += this->full_Graphic.getDistance(this->s[j], this->s[i + 1]);
-          actualCost += this->full_Graphic.getDistance(this->s[j - 1], this->s[i]);
-        }
-        if (i != 0)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[i - 1], this->s[i]);
-          actualCost += this->full_Graphic.getDistance(this->s[i - 1], this->s[j]);
-        }
-        if (j != (int)this->s.size() - 1)
-        {
-          actualCost -= this->full_Graphic.getDistance(this->s[j], this->s[j + 1]);
-          actualCost += this->full_Graphic.getDistance(this->s[i], this->s[j + 1]);
-        }
-        if (actualCost < minCost)
-        {
-          this->s[i] = this->s[i] + this->s[j];
-          this->s[j] = this->s[i] - this->s[j];
-          this->s[i] = this->s[i] - this->s[j];
-          improved = true;
-          minCost = actualCost;
-          this->minimum_solution = this->s;
-
-          this->s[i] = this->s[i] + this->s[j];
-          this->s[j] = this->s[i] - this->s[j];
-          this->s[i] = this->s[i] - this->s[j];
-        }
-      }
-    }
-  }
-  this->minimum_cost = minCost / this->normalizer;
-}
 
 double SAA::weightFunction(vector<int> &currentSolution){
   double sum = 0;
@@ -106,7 +51,7 @@ double SAA::weightFunction(vector<int> &currentSolution){
   return sum / this->normalizer;
 }
 
-void SAA::validEdge(int u, int v, double weight){
+void SAA::real_connection(int u, int v, double weight){
   this->Graphic.addConnection(u, v, weight);
   this->Graphic.addConnection(v, u, weight);
 }
@@ -162,13 +107,13 @@ void SAA::createOriginalDistanceGraph(){
     }
 }
 
-void SAA::addCity(int i, pair<double, double> position){ //Add curren city to final order vector
+void SAA::add_cityID(int i, pair<double, double> position){ //Add curren city to final order vector
   //TODO Update the vector in this function
   this->cities[i] = position;
 }
 
 //Procedimiento 1
-double SAA::calculateBatch(double T, bool hybrid, bool verbose){
+double SAA::calculateBatch(double T,  bool verbose){
   int c = 0;
   int i = 0;
   double r = 0.0;
@@ -179,29 +124,9 @@ double SAA::calculateBatch(double T, bool hybrid, bool verbose){
     sp.swap(get_neighbour.first);
     double neighbour_cost = get_neighbour.second;
 
-    // Use to sweep to find local min.
-    if (hybrid && neighbour_cost < this->minimum_cost)
-    {
-      if(verbose)
-      {
-        printf("%2.9f\num_cities", neighbour_cost);
-      }
-      sp.swap(this->minimum_solution);
-      this->minimum_cost = neighbour_cost;
-      this->computeSweep();
-
-      this->s = this->minimum_solution;
-      solution_cost = this->minimum_cost;
-      c += 1;
-      r += solution_cost;
-      continue;
-    }
-
-    if (neighbour_cost < solution_cost + T)
-    {
-      if(verbose)
-      {
-        printf("%2.9f\num_cities", neighbour_cost);
+    if (neighbour_cost < solution_cost + T){
+      if(verbose){
+        printf("%2.9f\n", neighbour_cost);
       }
       if(neighbour_cost < this->minimum_cost) {
         this->minimum_solution = sp;
@@ -211,20 +136,18 @@ double SAA::calculateBatch(double T, bool hybrid, bool verbose){
       solution_cost = neighbour_cost;
       c += 1;
       r += neighbour_cost;
-      // i = 0; // restart attempts on acceptance
     }
     else
       i += 1;
     if (i >= MAX_BATCH_ATTEMPTS)
       break;
   }
-  double res = (double)r / (double)BATCH_SIZE;
-  return res;
+  return (double)r / (double)BATCH_SIZE;
 }
 
 
 //Procedimiento 2
-void SAA::acceptancebyThresholds(double T, bool hybrid, bool verbose){
+void SAA::acceptancebyThresholds(double T, bool verbose){
   double p = 0;
   while (T > EPSILON)
   {
@@ -232,7 +155,7 @@ void SAA::acceptancebyThresholds(double T, bool hybrid, bool verbose){
     while (p <= q)
     {
       q = p;
-      p = this->calculateBatch(T, hybrid, verbose);
+      p = this->calculateBatch(T, verbose);
     }
     T = PHI * T;
   }
