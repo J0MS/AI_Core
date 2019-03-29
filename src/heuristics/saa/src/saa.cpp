@@ -88,11 +88,9 @@ double SAA::calculateDistance(double latU, double longU, double latV, double lon
 
 void SAA::createOriginalDistanceGraph(){
   for (int i = 0; i < this->num_cities; i++)
-    for (int j = 0; j < this->num_cities; j++)
-    {
+    for (int j = 0; j < this->num_cities; j++){
       double actualW = this->Graphic.getDistance(i, j);
-      if (actualW == -1)
-      {
+      if (actualW == -1){
         double latU = cities[i].first;
         double latV = cities[j].first;
         double longU = cities[i].second;
@@ -100,14 +98,13 @@ void SAA::createOriginalDistanceGraph(){
         double ws = SAA::calculateDistance(latU, longU, latV, longV) * this->max;
         this->full_Graphic.addConnection(i, j, ws);
       }
-      else
-      {
+      else{
         this->full_Graphic.addConnection(i, j, actualW);
       }
     }
 }
 
-void SAA::add_cityID(int i, pair<double, double> position){ //Add curren city to final order vector
+void SAA::add_cityID(int i, pair<double, double> position){
   //TODO Update the vector in this function
   this->cities[i] = position;
 }
@@ -279,7 +276,6 @@ pair<vector<int>, double> SAA::get_neighbour(double solution_cost){
 
 
 void generate_Vectors(std::string field, std::string table) {
-
   char *zErrMsg = 0;
   const char* data = "Callback function called";
   std::cout << zErrMsg << '\n';

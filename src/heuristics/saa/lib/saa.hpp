@@ -54,7 +54,7 @@ public:
   double initialTemperature(double, double);
   double percentageofAccepted(double);
   double binarySearch(double, double, double);
-  void computeSweep();
+
 
 
 public:
