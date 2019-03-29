@@ -36,7 +36,7 @@ pair<vector<int>, double> SAA::getSolution(vector<int> &currentSolution, bool ve
   this->normal(currentSolution);
   this->createOriginalDistanceGraph();
   this->generatenewPath(currentSolution);
-  double temperature = this->initialTemperature(INIT_T, MIN_INIT_ACC_P);
+  double temperature = this->initialTemperature(INITIAL_TEMP, MINIMUM_ACCEPTED_P);
   this->acceptancebyThresholds(temperature, verbose);
   return {this->minimum_solution, this->minimum_cost};
 }

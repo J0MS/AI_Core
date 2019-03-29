@@ -21,13 +21,13 @@ using namespace std;
 
 #define R 6373000 //Planet radius
 #define PI 3.14159265
-#define BATCH_SIZE 3000
+#define BATCH_SIZE 5000
 #define MAX_BATCH_ATTEMPTS BATCH_SIZE * 10
 #define EPSILON 0.001
 #define EPSILONP 0.0001
 #define PHI 0.95
-#define INIT_T 8
-#define MIN_INIT_ACC_P .95
+#define INITIAL_TEMP 8
+#define MINIMUM_ACCEPTED_P .95
 
 class SAA{
 public:

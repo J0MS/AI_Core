@@ -91,7 +91,7 @@ int main(int argc, char** argv){
   printf("Instance size:%d\n",(int)read_citiesList(argv[1]).size() );
   printf("\n");
   cout << "Memory: " << sizeof(instance) << " of " << getTotalSystemMemory() << " bytes" <<endl;
-  int fisrt_seed=0, last_seed=10; //How many seeds?
+  int fisrt_seed=0, last_seed=500; //How many seeds?
   bool verbose=false;
 
   //Loading db   -> Now this block is impossible refactoring.
