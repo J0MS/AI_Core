@@ -6,7 +6,6 @@
 #include <random>
 #include "saa.hpp"
 #include "matrix.hpp"
-#include <bits/stdc++.h>
 #include <algorithm>
 #include <math.h>
 #include <cmath>
