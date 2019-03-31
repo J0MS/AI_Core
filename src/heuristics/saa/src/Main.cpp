@@ -7,6 +7,7 @@
 #include "saa.hpp"
 #include <unistd.h>
 
+
 using namespace std;
 static const char VERSION[] = "0.1";
 istream *instance;
