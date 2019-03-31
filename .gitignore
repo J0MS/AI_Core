@@ -1,6 +1,13 @@
+<<<<<<< HEAD
+
+=======
 src/heuristics/saa/backup
+>>>>>>> master
 src/saa/tsp.sql
 src/saa/backup
 src/saa/saa
 src/saa/results.txt
+<<<<<<< HEAD
+=======
 src/heuristics/saa/build/
+>>>>>>> master
