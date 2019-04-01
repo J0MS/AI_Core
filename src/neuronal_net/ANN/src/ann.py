@@ -30,7 +30,7 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-# Part 2 - Now let's make the ANN!
+#========================Building ANN Arquitecture
 
 # Importing the Keras libraries and packages
 import keras
@@ -38,7 +38,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
 
-# Initialising the ANN
+# Initialising the ANN (Check models)
 classifier = Sequential()
 
 # Adding the input layer and the first hidden layer
@@ -58,6 +58,8 @@ classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = [
 # Fitting the ANN to the Training set
 classifier.fit(X_train, y_train, batch_size = 10, epochs = 100)
 
+
+
 # Part 3 - Making predictions and evaluating the model
 
 # Predicting the Test set results
@@ -76,6 +78,8 @@ Number of Products: 2
 Has Credit Card: Yes
 Is Active Member: Yes
 Estimated Salary: 50000"""
+
+
 new_prediction = classifier.predict(sc.transform(np.array([[0.0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])))
 new_prediction = (new_prediction > 0.5)
 
