@@ -20,6 +20,6 @@ install:
   - pip install meson
 
 script:
-  - meson build
-  - ninja -C build
-  - ninja -C build test
+  - meson AI_Core/src/heuristics/saa/build
+  - ninja -C AI_Core/src/heuristics/saa/build
+  - ninja -C AI_Core/src/heuristics/saa/build test
