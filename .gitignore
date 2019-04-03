@@ -5,4 +5,4 @@ src/saa/backup
 src/saa/saa
 src/saa/results.txt
 src/heuristics/saa/build/
-
+src/conway-game-life/target
