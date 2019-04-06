@@ -6,3 +6,6 @@ src/saa/saa
 src/saa/results.txt
 src/heuristics/saa/build/
 src/conway-game-life/target
+src/conway-game-life/build
+src/conway-game-life/.gradle/
+src/conway-game-life/build.gradle

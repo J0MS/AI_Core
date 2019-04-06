@@ -1,8 +1,8 @@
-package com.outbreaksimulator.app;
+package com.conway.app;
 import java.util.*;
 import javax.swing.*;
 
-public class UsoEpidemia {
+public class Main {
 	private static int x;
 	private static int y;
 	private static int time;

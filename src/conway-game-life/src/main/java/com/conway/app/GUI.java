@@ -1,4 +1,4 @@
-package com.outbreaksimulator.app;
+package com.conway.app;
 
 import java.awt.event.*;
 import javax.swing.*;
