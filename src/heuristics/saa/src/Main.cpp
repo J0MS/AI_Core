@@ -77,7 +77,7 @@ using namespace clara;
 
 //Configure flags & command line arguments.--------------------------------------------------------------------------
 auto arguments = clara::detail::Help(showHelp)
-             | clara::detail::Opt( width, "width" )["-w"]["--width"]("How wide should it be?")
+             | clara::detail::Opt( width, "width" )["-w"]["--width"]("Load SAA meta-parameters configuration file (specific)")
              | clara::detail::Opt( name, "name" )["-n"]["--name"]("By what name should I be known")
              | clara::detail::Opt( verbose )["-v"]["--verbose"]("Verbosity on" )
              | clara::detail::Opt( [&]( int i )
