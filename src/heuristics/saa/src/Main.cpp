@@ -1,11 +1,13 @@
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <chrono>
 #include <fstream>
 #include <sqlite3.h>
 #include "matrix.hpp"
 #include "saa.hpp"
 #include <unistd.h>
+#include "clara.hpp"
 
 
 using namespace std;
@@ -64,10 +66,73 @@ void updateCitiesCost(vector<int> cities_id,vector<double> list_Cities) {
 }
 
 
+enum class verbosity_level{
+   low, normal, debug
+};
+
+
+bool showHelp = false  ;
+
+// this block of variables are changed by Clara with the corresponding options passed
+// to the program.
+//
+int width = 0;
+std::string name;
+bool doIt = false;
+std::string command;
+
+int tempIndex = 0;
+
+
 // Fixed
 static int callback(void *, int, char **, char **);
 
 int main(int argc, char** argv){
+using namespace clara;
+
+auto arguments = clara::detail::Help(showHelp)
+             | clara::detail::Opt( width, "width" )["-w"]["--width"]("How wide should it be?")
+             | clara::detail::Opt( name, "name" )["-n"]["--name"]("By what name should I be known")
+             | clara::detail::Opt( doIt )["-d"]["--doit"]("Do the thing" )
+             | clara::detail::Opt( [&]( int i )
+                  {
+                    if (i < 0 || i > 10)
+                        return clara::detail::ParserResult::runtimeError("tempIndex must be between 0 and 10");
+                    else {
+                        tempIndex = i;
+                        return clara::detail::ParserResult::ok( clara::detail::ParseResultType::Matched );
+                    }
+                  }, "tempIndex" )
+                  ["-i"]( "An tempIndex, which is an integer between 0 and 10, inclusive" )
+             | clara::detail::Arg( command, "command" )("which command to run").required();
+
+             
+    auto result = arguments.parse( clara::detail::Args( argc, argv ) );
+    if( !result )
+    {
+	std::cerr << "Error in command line: " << result.errorMessage() << std::endl;
+	return 1;
+    }
+
+    if ( showHelp )
+    {
+	std::cerr << arguments << std::endl;
+        return 0;
+    }
+
+    // show the results!
+    std::cerr << "Show Help:" << showHelp << std::endl;
+    std::cerr << "Index:" << tempIndex << std::endl;
+    std::cerr << "Width:" << width << std::endl;
+    std::cerr << "Name:" << name << std::endl;
+    std::cerr << "Doit:" << doIt << std::endl;
+    std::cerr << "Command:" << command << std::endl;
+
+
+
+
+//return 0;
+
   printf("\n");
   printf("%-25s%-25s", " " ,"Simulated annealing algorithm.\n");
   printf("Version: %s | @J0MS \n",VERSION);
