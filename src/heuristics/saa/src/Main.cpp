@@ -31,7 +31,6 @@ bool is_file_exist(const char *fileName){
     return infile.good();
 }
 
-
 std::vector <int> read_citiesList(char instancias[]) {
 	std::vector <int> temp_arr;
   std::ifstream inFile(instancias);
@@ -55,34 +54,20 @@ std::vector <int> read_citiesList(char instancias[]) {
 }
 
 
-void updateCitiesCost(vector<int> cities_id,vector<double> list_Cities) {
-  for (size_t i = 0; i < cities_id.size()-1; i++) {
-    for (size_t j = i; j < cities_id.size()-1; j++) {
-      double distance = cities_id[i]+cities_id[j + 1];
-      list_Cities.push_back(distance );
-    }
-  }
-
-}
-
 
 enum class verbosity_level{
    low, normal, debug
 };
 
-
-bool showHelp = false  ;
-
+bool showHelp = false;
 // this block of variables are changed by Clara with the corresponding options passed
 // to the program.
 //
 int width = 0;
 std::string name;
-bool doIt = false;
+bool verbose = false;
 std::string command;
-
 int tempIndex = 0;
-
 
 // Fixed
 static int callback(void *, int, char **, char **);
@@ -90,10 +75,11 @@ static int callback(void *, int, char **, char **);
 int main(int argc, char** argv){
 using namespace clara;
 
+//Configure flags & command line arguments.--------------------------------------------------------------------------
 auto arguments = clara::detail::Help(showHelp)
              | clara::detail::Opt( width, "width" )["-w"]["--width"]("How wide should it be?")
              | clara::detail::Opt( name, "name" )["-n"]["--name"]("By what name should I be known")
-             | clara::detail::Opt( doIt )["-d"]["--doit"]("Do the thing" )
+             | clara::detail::Opt( verbose )["-v"]["--verbose"]("Verbosity on" )
              | clara::detail::Opt( [&]( int i )
                   {
                     if (i < 0 || i > 10)
@@ -105,33 +91,20 @@ auto arguments = clara::detail::Help(showHelp)
                   }, "tempIndex" )
                   ["-i"]( "An tempIndex, which is an integer between 0 and 10, inclusive" )
              | clara::detail::Arg( command, "command" )("which command to run").required();
+//---------------------------------------------End Command line args configuration--------------------------------------
 
-             
+//-----Parse commandline args
     auto result = arguments.parse( clara::detail::Args( argc, argv ) );
-    if( !result )
-    {
+    if( !result ){
 	std::cerr << "Error in command line: " << result.errorMessage() << std::endl;
 	return 1;
     }
 
-    if ( showHelp )
-    {
-	std::cerr << arguments << std::endl;
-        return 0;
+    if ( showHelp ){
+	     std::cerr << arguments << std::endl;
+       return 0;
     }
 
-    // show the results!
-    std::cerr << "Show Help:" << showHelp << std::endl;
-    std::cerr << "Index:" << tempIndex << std::endl;
-    std::cerr << "Width:" << width << std::endl;
-    std::cerr << "Name:" << name << std::endl;
-    std::cerr << "Doit:" << doIt << std::endl;
-    std::cerr << "Command:" << command << std::endl;
-
-
-
-
-//return 0;
 
   printf("\n");
   printf("%-25s%-25s", " " ,"Simulated annealing algorithm.\n");
