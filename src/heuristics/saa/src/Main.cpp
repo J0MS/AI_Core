@@ -14,6 +14,7 @@ using namespace std;
 static const char VERSION[] = "0.1";
 istream *instance;
 ifstream inFile;
+ifstream mpFile;
 Matrix graph(1092);
 SAA saa(1092);
 
@@ -64,8 +65,9 @@ bool showHelp = false;
 // to the program.
 //
 int width = 0;
-std::string name;
+std::string paramsFile;
 bool verbose = false;
+bool graphics = false;
 std::string command;
 int tempIndex = 0;
 
@@ -75,21 +77,21 @@ static int callback(void *, int, char **, char **);
 int main(int argc, char** argv){
 using namespace clara;
 
+
 //Configure flags & command line arguments.--------------------------------------------------------------------------
 auto arguments = clara::detail::Help(showHelp)
-             | clara::detail::Opt( width, "width" )["-w"]["--width"]("Load SAA meta-parameters configuration file (specific)")
-             | clara::detail::Opt( name, "name" )["-n"]["--name"]("By what name should I be known")
+             | clara::detail::Opt( paramsFile, "config" )["-c"]["--config"]("Load SAA meta-parameters configuration file (specific)")
              | clara::detail::Opt( verbose )["-v"]["--verbose"]("Verbosity on" )
+             | clara::detail::Opt( graphics, "graphics" )["-g"]["--graphics"]("Output graphics")
              | clara::detail::Opt( [&]( int i )
-                  {
-                    if (i < 0 || i > 10)
-                        return clara::detail::ParserResult::runtimeError("tempIndex must be between 0 and 10");
-                    else {
-                        tempIndex = i;
-                        return clara::detail::ParserResult::ok( clara::detail::ParseResultType::Matched );
-                    }
-                  }, "tempIndex" )
-                  ["-i"]( "An tempIndex, which is an integer between 0 and 10, inclusive" )
+                                  {
+                                    if (i < 0 || i > 10)
+                                        return clara::detail::ParserResult::runtimeError("tempIndex must be between 0 and 10");
+                                    else {
+                                        tempIndex = i;
+                                        return clara::detail::ParserResult::ok( clara::detail::ParseResultType::Matched );
+                                    }
+                                  }, "tempIndex" ) ["-i"]( "An tempIndex, which is an integer between 0 and 10, inclusive" )
              | clara::detail::Arg( command, "command" )("which command to run").required();
 //---------------------------------------------End Command line args configuration--------------------------------------
 
@@ -100,9 +102,12 @@ auto arguments = clara::detail::Help(showHelp)
 	return 1;
     }
 
-    if ( showHelp ){
+    if (showHelp){
 	     std::cerr << arguments << std::endl;
        return 0;
+    }
+    if (verbose){
+	     verbose=true;
     }
 
 
@@ -131,7 +136,7 @@ auto arguments = clara::detail::Help(showHelp)
   printf("\n");
   cout << "Memory: " << sizeof(instance) << " of " << getTotalSystemMemory() << " bytes" <<endl;
   int fisrt_seed=0, last_seed=500; //How many seeds?
-  bool verbose=false;
+  //bool verbose=false;
 
   //Loading db   -> Now this block is impossible refactoring.
   sqlite3 *db;
