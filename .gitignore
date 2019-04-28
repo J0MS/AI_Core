@@ -1,10 +1,8 @@
 
 src/heuristics/saa/backup
-src/saa/tsp.sql
-src/saa/backup
-src/saa/saa
-src/saa/results.txt
-src/heuristics/saa/build/
+src/heuristics/saa/build
+src/heuristics/aco/backup
+src/heuristics/aco/build/
 src/conway-game-life/target
 src/conway-game-life/build
 src/conway-game-life/.gradle/
