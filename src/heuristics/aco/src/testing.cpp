@@ -1,6 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include <bits/stdc++.h>
 #include <iostream>
+#include <unistd.h>
 #include <vector>
 #include "catch.hpp"
 #include "aco.hpp"
@@ -8,9 +9,34 @@
 
 
 //class ACO;
-using namespace std;
+//using namespace std;
+int seed = 100;
+int n, m, u, v, w;
 
 
+void init(){
+  std::cin >> n >> m;
+  ACO aco(n, m);
+}
+
+
+/*
+for(int i = 0; i < n; i++) {
+  std::cin >> w;
+  aco.setWeight(i, w);
+}
+for(; m > 0; m--) {
+  std::cin >> u >> v;
+  aco.setEdge(u, v);
+}
+aco.randomEngineGenerator(seed);
+printf("\nSeed: %d\n", seed);
+pair<unordered_set<int>, int> currentSolution = aco.getSolution();
+for (int x : currentSolution.first){
+  printf("%d, ", x);
+}
+
+*/
 
 
 int Factorial( int number ) {
