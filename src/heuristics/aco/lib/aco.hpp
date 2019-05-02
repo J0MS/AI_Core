@@ -7,15 +7,19 @@
 
 /* Class for represent Ants and atributes */
 class Ant{
-public:
-  int id;
-  matrix CV;
-  std::unordered_set<int> solution;
-  int solutionCost;
-  int edgesMissing;
-  int actualVertex;
+  public:
+    int id;
+    matrix CV;
+    std::unordered_set<int> solution;
+    int solutionCost;
+    int edgesMissing;
+    int actualVertex;
 
-  Ant(int k, int n){ this->id = k; this->CV = matrix(n);};
+    //Constructor
+    Ant(int k, int n){
+      this->id = k;
+      this->CV = matrix(n);
+    };
 };
 
 #endif
