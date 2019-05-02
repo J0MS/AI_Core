@@ -37,7 +37,7 @@ pair<unordered_set<int>, int> ACO::getSolution(){
   while (this->improveAttempts < MAX_IMPROVE_ATTEMPTS){
     for (Ant *k : this->ants){
       this->restart(k);
-      this->stateTransition(k, randomNode(this->dre));
+      this->stateTransition(k, randomNode(this->defaultRengine));
     }
     this->execIteration();
   }
@@ -115,7 +115,7 @@ void ACO::nextMove(Ant *k){
     }
     argSum += arg;
   }
-  double q = this->urd(this->dre);
+  double q = this->urd(this->defaultRengine);
   if (q < THRESHOLD){
     this->stateTransition(k, preferedVertex);
   }
@@ -129,7 +129,7 @@ void ACO::nextMove(Ant *k){
       }
     }
     uniform_real_distribution<double> dice(0, vertexProb.size() - 1);
-    int result = vertexProb[dice(this->dre)];
+    int result = vertexProb[dice(this->defaultRengine)];
     this->stateTransition(k, result);
   }
 }
@@ -200,8 +200,8 @@ void ACO::getFullGraph(){
 }
 
 void ACO::randomEngineGenerator(int seed){
-  default_random_engine dre(seed);
-  this->dre = dre;
+  default_random_engine defaultRengine(seed);
+  this->defaultRengine = defaultRengine;
   uniform_real_distribution<double> urd(0.0, 1.0);
   this->urd = urd;
 }

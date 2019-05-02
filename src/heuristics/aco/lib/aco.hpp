@@ -51,7 +51,7 @@ class ACO{
     unordered_set<int> bestSolution;
     int minimumCost;
     int improveAttempts;
-    default_random_engine dre;
+    default_random_engine defaultRengine;
     uniform_real_distribution<double> urd;
 
     void getFullGraph();

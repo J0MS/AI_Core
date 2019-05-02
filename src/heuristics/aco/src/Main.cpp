@@ -122,6 +122,7 @@ int main(int argc, char **argv){
       printf("%d, ", x);
     }
 
+
 /*
 
     int n, m, u, v, w;
@@ -137,7 +138,7 @@ int main(int argc, char **argv){
 
 */
 
-
+printf("\nCost: %d\n", currentSolution.second);
 
 
 
