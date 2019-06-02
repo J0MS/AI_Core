@@ -35,7 +35,7 @@ class Ant{
 
 using namespace std;
 
-#define ANTS 10
+#define ANTS 15
 #define RELATIVE_SIGNIFICANCE 1
 #define THRESHOLD 0.5
 #define EVAPORATION_RATE 0.2
