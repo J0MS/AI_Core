@@ -9,3 +9,4 @@ src/conway-game-life/target
 src/conway-game-life/build
 src/conway-game-life/.gradle/
 src/heuristics/abc/backup/
+src/optimization/optimization-pca-regression/.ipynb_checkpoints/
