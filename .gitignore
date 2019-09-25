@@ -2,8 +2,10 @@
 src/heuristics/saa/backup
 src/heuristics/saa/build
 src/heuristics/aco/backup
-src/heuristics/aco/build/
+src/heuristics/aco/build
+src/heuristics/a_star/backup
+src/heuristics/a_star/build
 src/conway-game-life/target
 src/conway-game-life/build
 src/conway-game-life/.gradle/
-
+src/heuristics/abc/backup/
