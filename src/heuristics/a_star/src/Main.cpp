@@ -3,7 +3,6 @@
 #include"matrix.h"
 #include"astar.h"
 static const char VERSION[] = "0.1";
-
 using namespace std;
 
 int main(){
@@ -20,7 +19,6 @@ int main(){
         cin>>position;
         initialPosition.state[i] = position;
     }
-
 
     astar(initialPosition);
     return 0;
